@@ -1,28 +1,14 @@
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 class Userinfo
 {
-private:
+protected:
     string username, password;
 public:
     Userinfo(string name, string pass) : username(name), password(pass) {}
-
-    ~Userinfo() {}
-};
-
-class Register : public Userinfo
-{
-public:
-    Register(string name, string pass) : Userinfo(name, pass)
-    {
-    }
-
-    void user_register(Userinfo &ob)
-    {
-        cout << "---User Registration Successful---" << endl;
-    }
 };
 
 class MenuItem
@@ -36,75 +22,38 @@ public:
 class RiceAndEgg : public MenuItem
 {
 public:
-    void display() override
-    {
-        cout << "1. Rice and Egg" << endl;
-    }
-    string getName() override
-    {
-        return "";
-    }
-    int getPrice() override
-    {
-        return 100;
-    }
+    void display() override { cout << "1. Rice and Egg (100 BDT)" << endl; }
+    string getName() override { return "Rice and Egg"; }
+    int getPrice() override { return 100; }
 };
 
 class VegetableAndFriedRice : public MenuItem
 {
 public:
-    void display() override
-    {
-        cout << "2. Vegetable1 Fried Rice" << endl;
-    }
-    string getName() override
-    {
-        return "";
-    };
-    int getPrice() override
-    {
-        return 150;
-    }
+    void display() override { cout << "2. Vegetable Fried Rice (150 BDT)" << endl; }
+    string getName() override { return "Vegetable Fried Rice"; }
+    int getPrice() override { return 150; }
 };
 
 class Mutton : public MenuItem
 {
 public:
-    void display() override
-    {
-        cout << "3. Mutton" << endl;
-    }
-    string getName() override
-    {
-        return "";
-    };
-    int getPrice() override
-    {
-        return 200;
-    }
+    void display() override { cout << "3. Mutton (200 BDT)" << endl; }
+    string getName() override { return "Mutton"; }
+    int getPrice() override { return 200; }
 };
 
 class Chicken : public MenuItem
 {
 public:
-    void display() override
-    {
-        cout << "4. Chicken" << endl;
-    }
-    string getName() override
-    {
-        return "";
-    };
-    int getPrice() override
-    {
-        return 250;
-    }
+    void display() override { cout << "4. Chicken (250 BDT)" << endl; }
+    string getName() override { return "Chicken"; }
+    int getPrice() override { return 250; }
 };
 
 class totalBalance
 {
 private:
-    string name;
     int fund;
 
 public:
@@ -112,7 +61,7 @@ public:
 
     void showBalance()
     {
-        cout << "Balance: " << fund << " BDT" << endl;
+        cout << "Remaining Balance: " << fund << " BDT" << endl;
     }
 
     bool reduce(int amount)
@@ -124,38 +73,38 @@ public:
         }
         else
         {
-            cout << "Insufficient balance." << endl;
+            cout << "Insufficient balance!" << endl;
             return false;
         }
     }
 };
+
 int main()
 {
-    Userinfo *user = nullptr;
+    Userinfo* user = nullptr;
     totalBalance balance(1000);
-    string meal = "";
+    vector<string> meals;
 
     int op;
     string name, pass;
-    Register *manage;
 
     while (true)
     {
-        cout << "1. Register User" << endl;
+        cout << "\n1. Register User" << endl;
         cout << "2. Menu Items" << endl;
-        cout << "3. Total Balance & Remaining Balance" << endl;
-        cout << "4. Total Meal" << endl;
+        cout << "3. Show Balance" << endl;
+        cout << "4. Show Total Meals" << endl;
         cout << "5. Exit" << endl;
 
         cout << "Enter Your Choice: ";
         cin >> op;
-        cout << endl;
 
         RiceAndEgg rice;
-        VegetableAndFriedRice vegetableAndFriedRice;
+        VegetableAndFriedRice veg;
         Mutton mutton;
         Chicken chicken;
-        MenuItem *chosenItem = nullptr;
+        MenuItem* chosenItem = nullptr;
+
         switch (op)
         {
         case 1:
@@ -166,68 +115,55 @@ int main()
             user = new Userinfo(name, pass);
             cout << "---User Registration Successful---" << endl;
             break;
+
         case 2:
-            if (user == nullptr)
+            if (!user)
             {
-                cout << "Register first" << endl;
+                cout << "Register first!" << endl;
                 break;
             }
 
-            int input;
-
             rice.display();
-            vegetableAndFriedRice.display();
+            veg.display();
             mutton.display();
             chicken.display();
 
+            int input;
             cin >> input;
 
-            if (input == 1)
-            {
-                chosenItem = &rice;
-            }
-            else if (input == 2)
-            {
-                chosenItem = &vegetableAndFriedRice;
-            }
-            else if (input == 3)
-            {
-                chosenItem = &mutton;
-            }
-            else if (input == 4)
-            {
-                chosenItem = &chicken;
-            }
-
-            if (chosenItem != nullptr)
-            {
-                chosenItem->display();
-                meal = chosenItem->getName();
-                if (balance.reduce(chosenItem->getPrice()))
-                {
-                    cout << "You have chosen: " << meal << endl;
-                }
-            }
+            if (input == 1) chosenItem = &rice;
+            else if (input == 2) chosenItem = &veg;
+            else if (input == 3) chosenItem = &mutton;
+            else if (input == 4) chosenItem = &chicken;
             else
             {
-                cout << "Invalid choice" << endl;
+                cout << "Invalid choice!" << endl;
+                break;
             }
 
+            if (balance.reduce(chosenItem->getPrice()))
+            {
+                meals.push_back(chosenItem->getName());
+                cout << "You ordered: " << chosenItem->getName() << endl;
+            }
             break;
+
         case 3:
             balance.showBalance();
             break;
+
         case 4:
-            cout << "Total Meal: " << meal << endl;
+            cout << "Total Meals Ordered:" << endl;
+            for (string m : meals)
+                cout << "- " << m << endl;
             break;
+
         case 5:
             delete user;
             return 0;
+
         default:
-            cout << "Invalid option " << endl;
-            break;
+            cout << "Invalid option!" << endl;
         }
     }
-
-    return 0;
 }
